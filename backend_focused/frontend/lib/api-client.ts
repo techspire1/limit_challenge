@@ -1,6 +1,8 @@
 import axios from 'axios';
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000/api';
+// 127.0.0.1 rather than localhost: `runserver` binds IPv4 only, while browsers
+// resolve localhost to ::1 first and fail the request outright.
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:8000/api';
 
 export const apiClient = axios.create({
   baseURL: apiBaseUrl,

@@ -1,3 +1,7 @@
+> **Submission:** see [SOLUTION.md](SOLUTION.md) for how to run the project and the
+> tests, the API reference, and the assumptions and tradeoffs behind the
+> implementation.
+
 # Fleet Maintenance API Take-home Challenge
 
 Build a REST API for managing a fleet of vehicles and their maintenance history.

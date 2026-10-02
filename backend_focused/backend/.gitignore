@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+
+.venv/
+venv/
+env/
+
+db.sqlite3
+db.sqlite3-journal
+
+*.log
+runserver.out
+runserver.err
+
+.env
+.env.local
