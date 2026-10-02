@@ -8,6 +8,15 @@ from faker import Faker
 from submissions import models
 
 
+def follows(created_at, hours):
+    """A timestamp `hours` after `created_at`, never in the future.
+
+    Submissions seeded with a recent `created_at` would otherwise get notes and
+    documents dated days ahead, which the UI reports as "in 2 days".
+    """
+    return min(created_at + timedelta(hours=hours), timezone.now())
+
+
 class Command(BaseCommand):
     help = "Seed a small dataset for the Submission Tracker challenge"
 
@@ -111,7 +120,7 @@ class Command(BaseCommand):
                         title=fake.catch_phrase(),
                         doc_type=choice(doc_types),
                         file_url=fake.url(),
-                        uploaded_at=submission.created_at + timedelta(hours=randint(1, 48)),
+                        uploaded_at=follows(submission.created_at, randint(1, 48)),
                     )
                 )
 
@@ -121,13 +130,21 @@ class Command(BaseCommand):
                         submission=submission,
                         author_name=choice([submission.owner.full_name, fake.name()]),
                         body=fake.paragraph(nb_sentences=3),
-                        created_at=submission.created_at + timedelta(hours=randint(2, 72)),
+                        created_at=follows(submission.created_at, randint(2, 72)),
                     )
                 )
 
         models.Contact.objects.bulk_create(contacts)
-        models.Document.objects.bulk_create(documents)
         models.Note.objects.bulk_create(notes)
+
+        # `Document.uploaded_at` is auto_now_add, so the insert overwrites the
+        # timestamps above with "now" and every document looks like it arrived
+        # today. Capture the intended values first, then write them back.
+        intended_upload_times = [document.uploaded_at for document in documents]
+        created_documents = models.Document.objects.bulk_create(documents)
+        for document, uploaded_at in zip(created_documents, intended_upload_times):
+            document.uploaded_at = uploaded_at
+        models.Document.objects.bulk_update(created_documents, ["uploaded_at"])
 
         self.stdout.write(
             self.style.SUCCESS(

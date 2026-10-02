@@ -1,59 +1,40 @@
-'use client';
+import { Suspense } from 'react';
+import { Box, Card, CardContent, Skeleton, Stack } from '@mui/material';
 
-import {
-  Box,
-  Card,
-  CardContent,
-  Container,
-  Divider,
-  Link as MuiLink,
-  Stack,
-  Typography,
-} from '@mui/material';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { SubmissionDetailView } from '@/components/submissions/SubmissionDetailView';
 
-import { useSubmissionDetail } from '@/lib/hooks/useSubmissions';
+export const metadata = {
+  title: 'Submission · Submission Tracker',
+};
 
-export default function SubmissionDetailPage() {
-  const params = useParams<{ id: string }>();
-  const submissionId = params?.id ?? '';
+export default async function SubmissionDetailPage({
+  params,
+}: {
+  // Route params are a promise in Next 16.
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 
-  const detailQuery = useSubmissionDetail(submissionId);
-
+  // The view reads `returnTo` from the query string, which needs a Suspense
+  // boundary around `useSearchParams`.
   return (
-    <Container maxWidth="md" sx={{ py: 6 }}>
-      <Stack spacing={3}>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <div>
-            <Typography variant="h4">Submission detail</Typography>
-            <Typography color="text.secondary">
-              Use this page to present the full submission payload along with contacts, documents,
-              and notes.
-            </Typography>
-          </div>
-          <MuiLink component={Link} href="/submissions" underline="none">
-            Back to list
-          </MuiLink>
-        </Box>
+    <Suspense fallback={<DetailFallback />}>
+      <SubmissionDetailView id={id} />
+    </Suspense>
+  );
+}
 
-        <Card variant="outlined">
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              API data placeholder
-            </Typography>
-            <Typography color="text.secondary">
-              The React Query call is disabled until you turn it on. Once you enable it and wire up
-              serializers on the backend you can render key facts, contacts, documents, and note
-              timelines.
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <pre style={{ margin: 0, fontSize: 14 }}>
-              {JSON.stringify({ submissionId, queryKey: detailQuery.queryKey }, null, 2)}
-            </pre>
-          </CardContent>
-        </Card>
-      </Stack>
-    </Container>
+function DetailFallback() {
+  return (
+    <Stack spacing={3}>
+      <Box>
+        <Skeleton variant="text" width={320} height={48} />
+      </Box>
+      <Card>
+        <CardContent>
+          <Skeleton variant="rounded" height={160} />
+        </CardContent>
+      </Card>
+    </Stack>
   );
 }

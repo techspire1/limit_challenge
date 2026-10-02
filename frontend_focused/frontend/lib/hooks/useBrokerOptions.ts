@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { apiClient } from '@/lib/api-client';
-import { Broker } from '@/lib/types';
+import type { Broker } from '@/lib/types';
 
 async function fetchBrokers() {
   const response = await apiClient.get<Broker[]>('/brokers/');
@@ -14,6 +14,8 @@ export function useBrokerOptions() {
   return useQuery({
     queryKey: ['brokers'],
     queryFn: fetchBrokers,
-    enabled: false,
+    // Brokers are reference data for a dropdown; refetching them per filter
+    // change would be pure overhead.
+    staleTime: 5 * 60_000,
   });
 }

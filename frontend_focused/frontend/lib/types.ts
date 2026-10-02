@@ -80,8 +80,37 @@ export interface PaginatedResponse<T> {
   results: T[];
 }
 
+/** Sortable columns, named as the API's `?ordering=` aliases. */
+export type SubmissionSortField =
+  | 'createdAt'
+  | 'company'
+  | 'broker'
+  | 'owner'
+  | 'status'
+  | 'priority'
+  | 'documentCount'
+  | 'noteCount'
+  | 'latestNoteAt';
+
+export type SortDirection = 'asc' | 'desc';
+
+/**
+ * The full filter state, which is also what lives in the URL query string.
+ *
+ * Every field is optional so an absent value means "no constraint" in both
+ * places, and the two stay in sync without a translation layer.
+ */
 export interface SubmissionListFilters {
   status?: SubmissionStatus;
+  priority?: SubmissionPriority;
   brokerId?: string;
   companySearch?: string;
+  createdFrom?: string;
+  createdTo?: string;
+  hasDocuments?: boolean;
+  hasNotes?: boolean;
+  page?: number;
+  pageSize?: number;
+  sortBy?: SubmissionSortField;
+  sortDirection?: SortDirection;
 }

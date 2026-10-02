@@ -1,5 +1,8 @@
 # Submission Tracker Take-home Challenge
 
+> **Submission:** the approach, tradeoffs, assumptions and run instructions for this solution are
+> in [SOLUTION.md](./SOLUTION.md).
+
 This repository hosts the boilerplate for the Submission Tracker assignment. It includes a Django +
 Django REST Framework backend and a Next.js frontend scaffold so candidates can focus on API
 design, relational data modelling, and product-focused UI work.
